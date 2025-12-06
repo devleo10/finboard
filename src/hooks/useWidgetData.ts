@@ -10,14 +10,19 @@ export const useWidgetData = (widget: Widget) => {
     useDashboardStore()
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (skipCache: boolean = false) => {
     setWidgetLoading(widget.id, true)
     setWidgetError(widget.id, null)
 
     try {
+      // Clear cache if manual refresh
+      if (skipCache) {
+        apiService.clearCacheEntry(widget.id)
+      }
+
       const response = await apiService.fetch({
         url: widget.apiUrl,
-        useCache: true,
+        useCache: !skipCache,
         cacheKey: widget.id,
       })
 
@@ -56,7 +61,7 @@ export const useWidgetData = (widget: Widget) => {
   }, [fetchData, widget.refreshInterval])
 
   return {
-    refetch: fetchData,
+    refetch: () => fetchData(true), // Skip cache on manual refresh
   }
 }
 

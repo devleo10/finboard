@@ -142,10 +142,16 @@ export const filterFields = (
 }
 
 export const getValueByPath = (obj: any, path: string): any => {
+  if (!path || !obj) return undefined
+  
   const keys = path.split('.')
   let current = obj
 
   for (const key of keys) {
+    if (current === null || current === undefined) {
+      return undefined
+    }
+
     // Handle array indices like "data[0]"
     if (key.includes('[') && key.includes(']')) {
       const [baseKey, indexStr] = key.split('[')
@@ -161,8 +167,13 @@ export const getValueByPath = (obj: any, path: string): any => {
         return undefined
       }
     } else {
-      if (current && typeof current === 'object' && key in current) {
-        current = current[key]
+      // Check if current is an object and has the key
+      if (current && typeof current === 'object' && !Array.isArray(current)) {
+        if (key in current) {
+          current = current[key]
+        } else {
+          return undefined
+        }
       } else {
         return undefined
       }

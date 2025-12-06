@@ -42,7 +42,7 @@ export const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen p-4 md:p-6 lg:p-8">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">

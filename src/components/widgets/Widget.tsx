@@ -11,20 +11,21 @@ interface WidgetProps {
   widget: WidgetType
   children: React.ReactNode
   onSettingsClick?: () => void
+  onRefresh?: () => void
 }
 
 export const Widget: React.FC<WidgetProps> = ({
   widget,
   children,
   onSettingsClick,
+  onRefresh,
 }) => {
-  const { removeWidget, setWidgetLoading, setWidgetError } = useDashboardStore()
+  const { removeWidget } = useDashboardStore()
 
   const handleRefresh = async () => {
-    // Refresh will be handled by useWidgetData hook
-    // This just triggers a re-fetch
-    setWidgetLoading(widget.id, true)
-    setWidgetError(widget.id, null)
+    if (onRefresh) {
+      onRefresh()
+    }
   }
 
   const handleDelete = () => {

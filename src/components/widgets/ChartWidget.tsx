@@ -19,11 +19,13 @@ import { formatValue } from '@/utils/formatters'
 interface ChartWidgetProps {
   widget: WidgetType
   onSettingsClick?: () => void
+  onRefresh?: () => void
 }
 
 export const ChartWidget: React.FC<ChartWidgetProps> = ({
   widget,
   onSettingsClick,
+  onRefresh,
 }) => {
   const chartData = useMemo(() => {
     if (!widget.data) return []
@@ -50,7 +52,7 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({
 
   if (chartData.length === 0) {
     return (
-      <Widget widget={widget} onSettingsClick={onSettingsClick}>
+      <Widget widget={widget} onSettingsClick={onSettingsClick} onRefresh={onRefresh}>
         <div className="flex items-center justify-center h-full p-8 text-dark-muted">
           <p>No data available</p>
         </div>
@@ -69,7 +71,7 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({
   ]
 
   return (
-    <Widget widget={widget} onSettingsClick={onSettingsClick}>
+    <Widget widget={widget} onSettingsClick={onSettingsClick} onRefresh={onRefresh}>
       <div className="h-full w-full">
         <ResponsiveContainer width="100%" height="100%" minHeight={300}>
           <LineChart

@@ -14,8 +14,24 @@ export const dataMapper = {
 
     for (const field of selectedFields) {
       const value = getValueByPath(data, field.path)
-      const key = field.displayName || field.path.split('.').pop() || field.path
-      mapped[key] = value
+      // Use displayName if provided, otherwise use a more descriptive key
+      // to avoid collisions (e.g., "rates.INR" instead of just "INR")
+      let key = field.displayName
+      if (!key) {
+        const pathParts = field.path.split('.')
+        // Use last 2 parts if available to make keys more unique
+        // e.g., "rates.INR" instead of just "INR"
+        if (pathParts.length >= 2) {
+          key = pathParts.slice(-2).join('.')
+        } else {
+          key = pathParts[pathParts.length - 1] || field.path
+        }
+      }
+      
+      // Only add if value is not undefined (null is allowed)
+      if (value !== undefined) {
+        mapped[key] = value
+      }
     }
 
     return mapped

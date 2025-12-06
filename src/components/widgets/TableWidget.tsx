@@ -107,7 +107,7 @@ export const TableWidget: React.FC<TableWidgetProps> = ({
 
   if (tableData.length === 0) {
     return (
-      <Widget widget={widget} onSettingsClick={onSettingsClick}>
+      <Widget widget={widget} onSettingsClick={onSettingsClick} onRefresh={onRefresh}>
         <div className="flex items-center justify-center h-full p-8 text-dark-muted">
           <p>No data available</p>
         </div>
@@ -116,7 +116,7 @@ export const TableWidget: React.FC<TableWidgetProps> = ({
   }
 
   return (
-    <Widget widget={widget} onSettingsClick={onSettingsClick}>
+    <Widget widget={widget} onSettingsClick={onSettingsClick} onRefresh={onRefresh}>
       <div className="flex flex-col h-full">
         {/* Search */}
         <div className="mb-4">

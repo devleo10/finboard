@@ -17,20 +17,34 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
   onSettingsClick,
 }) => {
   // Hook must be called at top level
-  useWidgetData(widget)
+  const { refetch } = useWidgetData(widget)
 
   switch (widget.displayMode) {
     case 'table':
       return (
-        <TableWidget widget={widget} onSettingsClick={onSettingsClick} />
+        <TableWidget
+          widget={widget}
+          onSettingsClick={onSettingsClick}
+          onRefresh={refetch}
+        />
       )
     case 'chart':
       return (
-        <ChartWidget widget={widget} onSettingsClick={onSettingsClick} />
+        <ChartWidget
+          widget={widget}
+          onSettingsClick={onSettingsClick}
+          onRefresh={refetch}
+        />
       )
     case 'card':
     default:
-      return <CardWidget widget={widget} onSettingsClick={onSettingsClick} />
+      return (
+        <CardWidget
+          widget={widget}
+          onSettingsClick={onSettingsClick}
+          onRefresh={refetch}
+        />
+      )
   }
 }
 
