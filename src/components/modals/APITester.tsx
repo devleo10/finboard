@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { CheckCircle2, XCircle, Loader2 } from 'lucide-react'
+import { CheckCircle2, XCircle, Loader2, RefreshCw } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { apiService } from '@/services/apiService'
 import { exploreFields } from '@/utils/fieldExplorer'
 import { APIResponse } from '@/store/types'
@@ -68,50 +69,56 @@ export const APITester: React.FC<APITesterProps> = ({
 
   return (
     <div className="space-y-3">
-      <button
+      <motion.button
         onClick={handleTest}
         disabled={isTesting}
-        className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary/20"
       >
         {isTesting ? (
           <>
             <Loader2 size={16} className="animate-spin" />
-            Testing...
+            <span>Testing...</span>
           </>
         ) : (
           <>
+            <RefreshCw size={16} />
             <span>Test</span>
           </>
         )}
-      </button>
+      </motion.button>
 
-      {testResult && (
-        <div
-          className={cn(
-            'p-3 rounded-lg border',
-            testResult.success
-              ? 'bg-green-500/10 border-green-500/50 text-green-400'
-              : 'bg-red-500/10 border-red-500/50 text-red-400'
-          )}
-        >
-          <div className="flex items-start gap-2">
-            {testResult.success ? (
-              <CheckCircle2 size={20} className="mt-0.5 flex-shrink-0" />
-            ) : (
-              <XCircle size={20} className="mt-0.5 flex-shrink-0" />
+      <AnimatePresence>
+        {testResult && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className={cn(
+              'p-3 rounded-lg border',
+              testResult.success
+                ? 'bg-green-500/10 border-green-500/50 text-green-400'
+                : 'bg-red-500/10 border-red-500/50 text-red-400'
             )}
-            <div className="flex-1">
-              <p className="font-medium">
-                {testResult.success
-                  ? `API connection successful! ${testResult.fieldCount || 0} top-level fields found.`
-                  : testResult.error || 'API connection failed'}
-              </p>
+          >
+            <div className="flex items-start gap-2">
+              {testResult.success ? (
+                <CheckCircle2 size={20} className="mt-0.5 flex-shrink-0" />
+              ) : (
+                <XCircle size={20} className="mt-0.5 flex-shrink-0" />
+              )}
+              <div className="flex-1">
+                <p className="font-medium">
+                  {testResult.success
+                    ? `API connection successful! ${testResult.fieldCount || 0} top-level fields found.`
+                    : testResult.error || 'API connection failed'}
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
-
-

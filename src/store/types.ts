@@ -1,6 +1,18 @@
-export type DisplayMode = 'card' | 'table' | 'chart'
+export type DisplayMode = 'card' | 'table' | 'chart' | 'candlestick'
 
 export type FieldType = 'string' | 'number' | 'boolean' | 'object' | 'array' | 'null'
+
+export type FormatType = 'auto' | 'currency' | 'percentage' | 'number' | 'text'
+
+export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'INR' | 'JPY' | 'CNY' | 'AUD' | 'CAD'
+
+export interface FormatOptions {
+  type: FormatType
+  currency?: CurrencyCode
+  decimals?: number
+  prefix?: string
+  suffix?: string
+}
 
 export interface FieldInfo {
   path: string
@@ -12,6 +24,7 @@ export interface FieldInfo {
 export interface SelectedField {
   path: string
   displayName?: string
+  format?: FormatOptions
 }
 
 export interface WidgetConfig {
@@ -22,6 +35,7 @@ export interface WidgetConfig {
   displayMode: DisplayMode
   selectedFields: SelectedField[]
   showArraysOnly?: boolean
+  description?: string
 }
 
 export interface Widget extends WidgetConfig {
@@ -49,5 +63,3 @@ export interface StorageData {
   widgets: Widget[]
   version: string
 }
-
-

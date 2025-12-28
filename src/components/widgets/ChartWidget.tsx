@@ -14,7 +14,7 @@ import {
 import { Widget } from './Widget'
 import { Widget as WidgetType } from '@/store/types'
 import { dataMapper } from '@/services/dataMapper'
-import { formatValue } from '@/utils/formatters'
+import { useThemeStore } from '@/store/useThemeStore'
 
 interface ChartWidgetProps {
   widget: WidgetType
@@ -27,6 +27,8 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({
   onSettingsClick,
   onRefresh,
 }) => {
+  const { theme } = useThemeStore()
+  
   const chartData = useMemo(() => {
     if (!widget.data) return []
     return dataMapper.extractChartData(widget.data, widget.selectedFields)
@@ -37,7 +39,6 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({
     return Object.keys(chartData[0])
   }, [chartData])
 
-  // Find a suitable X-axis column (prefer time/date fields)
   const xAxisColumn = useMemo(() => {
     const timeColumns = columns.filter((col) =>
       /time|date|timestamp|day|month|year/i.test(col)
@@ -53,14 +54,13 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({
   if (chartData.length === 0) {
     return (
       <Widget widget={widget} onSettingsClick={onSettingsClick} onRefresh={onRefresh}>
-        <div className="flex items-center justify-center h-full p-8 text-dark-muted">
+        <div className="flex items-center justify-center h-full p-8 text-muted">
           <p>No data available</p>
         </div>
       </Widget>
     )
   }
 
-  // Generate colors for multiple lines
   const colors = [
     '#10b981', // primary green
     '#3b82f6', // blue
@@ -70,31 +70,36 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({
     '#ec4899', // pink
   ]
 
+  const isDark = theme === 'dark'
+  const gridColor = isDark ? '#262626' : '#e4e4e7'
+  const textColor = isDark ? '#a1a1aa' : '#71717a'
+  const bgColor = isDark ? '#141414' : '#f4f4f5'
+
   return (
     <Widget widget={widget} onSettingsClick={onSettingsClick} onRefresh={onRefresh}>
-      <div className="h-full w-full">
-        <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+      <div className="flex-1 min-h-[300px] max-h-[400px]">
+        <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={chartData}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
             <XAxis
               dataKey={xAxisColumn}
-              stroke="#94a3b8"
-              tick={{ fill: '#94a3b8' }}
+              stroke={textColor}
+              tick={{ fill: textColor, fontSize: 12 }}
             />
-            <YAxis stroke="#94a3b8" tick={{ fill: '#94a3b8' }} />
+            <YAxis stroke={textColor} tick={{ fill: textColor, fontSize: 12 }} />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#1e293b',
-                border: '1px solid #334155',
+                backgroundColor: bgColor,
+                border: `1px solid ${gridColor}`,
                 borderRadius: '8px',
-                color: '#f1f5f9',
+                color: isDark ? '#fafafa' : '#18181b',
               }}
             />
             <Legend
-              wrapperStyle={{ color: '#f1f5f9' }}
+              wrapperStyle={{ color: textColor }}
               iconType="line"
             />
             {dataColumns.map((column, index) => (
@@ -115,5 +120,3 @@ export const ChartWidget: React.FC<ChartWidgetProps> = ({
     </Widget>
   )
 }
-
-

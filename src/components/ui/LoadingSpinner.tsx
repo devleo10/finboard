@@ -11,20 +11,18 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   className,
 }) => {
   const sizes = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
+    sm: 'w-4 h-4 border-2',
+    md: 'w-8 h-8 border-2',
+    lg: 'w-12 h-12 border-3',
   }
 
   return (
     <div
       className={cn(
-        'animate-spin rounded-full border-2 border-dark-border border-t-primary',
+        'animate-spin rounded-full border-border border-t-primary',
         sizes[size],
         className
       )}
     />
   )
 }
-
-

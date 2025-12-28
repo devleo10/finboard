@@ -6,6 +6,7 @@ import { useWidgetData } from '@/hooks/useWidgetData'
 import { CardWidget } from './CardWidget'
 import { TableWidget } from './TableWidget'
 import { ChartWidget } from './ChartWidget'
+import { CandlestickWidget } from './CandlestickWidget'
 
 interface WidgetWrapperProps {
   widget: WidgetType
@@ -16,7 +17,6 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
   widget,
   onSettingsClick,
 }) => {
-  // Hook must be called at top level
   const { refetch } = useWidgetData(widget)
 
   switch (widget.displayMode) {
@@ -36,6 +36,14 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
           onRefresh={refetch}
         />
       )
+    case 'candlestick':
+      return (
+        <CandlestickWidget
+          widget={widget}
+          onSettingsClick={onSettingsClick}
+          onRefresh={refetch}
+        />
+      )
     case 'card':
     default:
       return (
@@ -47,5 +55,3 @@ export const WidgetWrapper: React.FC<WidgetWrapperProps> = ({
       )
   }
 }
-
-

@@ -2,10 +2,12 @@
 
 import React from 'react'
 import { RefreshCw, Settings, Trash2 } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { Widget as WidgetType } from '@/store/types'
 import { useDashboardStore } from '@/store/useDashboardStore'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { cn } from '@/utils/cn'
+import { formatStockTitle } from '@/utils/stockUtils'
 
 interface WidgetProps {
   widget: WidgetType
@@ -49,13 +51,22 @@ export const Widget: React.FC<WidgetProps> = ({
   }
 
   return (
-    <div className="bg-dark-surface rounded-lg border border-dark-border p-4 flex flex-col h-full">
+    <motion.div 
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.2 }}
+      className="bg-surface rounded-xl border border-border p-4 flex flex-col h-full min-h-[400px] shadow-lg hover:shadow-xl transition-shadow duration-300"
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <h3 className="text-lg font-semibold text-dark-text">{widget.name}</h3>
+        <div className="flex items-center gap-2 min-w-0">
+          <h3 className="text-lg font-semibold text-foreground truncate">
+            {formatStockTitle(widget.name)}
+          </h3>
           {widget.refreshInterval && (
-            <span className="text-xs px-2 py-0.5 bg-dark-bg rounded text-dark-muted">
+            <span className="flex-shrink-0 text-xs px-2 py-0.5 bg-background rounded-full text-muted font-mono">
               {widget.refreshInterval}s
             </span>
           )}
@@ -64,7 +75,7 @@ export const Widget: React.FC<WidgetProps> = ({
           <button
             onClick={handleRefresh}
             disabled={widget.isLoading}
-            className="p-1.5 text-dark-muted hover:text-dark-text hover:bg-dark-bg rounded transition-colors disabled:opacity-50"
+            className="p-1.5 text-muted hover:text-foreground hover:bg-background rounded-lg transition-colors disabled:opacity-50"
             title="Refresh"
           >
             <RefreshCw
@@ -75,7 +86,7 @@ export const Widget: React.FC<WidgetProps> = ({
           {onSettingsClick && (
             <button
               onClick={onSettingsClick}
-              className="p-1.5 text-dark-muted hover:text-dark-text hover:bg-dark-bg rounded transition-colors"
+              className="p-1.5 text-muted hover:text-foreground hover:bg-background rounded-lg transition-colors"
               title="Settings"
             >
               <Settings size={16} />
@@ -83,7 +94,7 @@ export const Widget: React.FC<WidgetProps> = ({
           )}
           <button
             onClick={handleDelete}
-            className="p-1.5 text-dark-muted hover:text-red-500 hover:bg-dark-bg rounded transition-colors"
+            className="p-1.5 text-muted hover:text-red-500 hover:bg-background rounded-lg transition-colors"
             title="Delete"
           >
             <Trash2 size={16} />
@@ -92,9 +103,9 @@ export const Widget: React.FC<WidgetProps> = ({
       </div>
 
       {/* Content */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative min-h-0">
         {widget.isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-dark-surface/50 rounded z-10">
+          <div className="absolute inset-0 flex items-center justify-center bg-surface/80 backdrop-blur-sm rounded-lg z-10">
             <LoadingSpinner size="md" />
           </div>
         )}
@@ -116,14 +127,15 @@ export const Widget: React.FC<WidgetProps> = ({
 
       {/* Footer */}
       {widget.lastUpdated && (
-        <div className="mt-4 pt-3 border-t border-dark-border">
-          <p className="text-xs text-dark-muted">
-            Last updated: {formatLastUpdated(widget.lastUpdated)}
-          </p>
+        <div className="mt-4 pt-3 border-t border-border">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted">
+              Last updated: {formatLastUpdated(widget.lastUpdated)}
+            </p>
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" title="Live" />
+          </div>
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }
-
-

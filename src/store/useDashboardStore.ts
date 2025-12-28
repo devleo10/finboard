@@ -13,6 +13,7 @@ interface DashboardStore extends DashboardState {
   setIsAddingWidget: (isAdding: boolean) => void
   setEditingWidgetId: (id: string | null) => void
   hydrate: () => void
+  clearWidgets: () => void
 }
 
 export const useDashboardStore = create<DashboardStore>((set, get) => ({
@@ -101,6 +102,12 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     if (savedWidgets && savedWidgets.length > 0) {
       set({ widgets: savedWidgets })
     }
+  },
+  clearWidgets: () => {
+    set(() => {
+      storageService.clearWidgets()
+      return { widgets: [] }
+    })
   },
 }))
 

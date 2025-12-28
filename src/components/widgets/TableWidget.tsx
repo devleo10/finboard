@@ -6,12 +6,12 @@ import { Widget } from './Widget'
 import { Widget as WidgetType } from '@/store/types'
 import { dataMapper } from '@/services/dataMapper'
 import { formatValue } from '@/utils/formatters'
-import { Input } from '@/components/ui/Input'
 import { cn } from '@/utils/cn'
 
 interface TableWidgetProps {
   widget: WidgetType
   onSettingsClick?: () => void
+  onRefresh?: () => void
 }
 
 type SortDirection = 'asc' | 'desc' | null
@@ -22,6 +22,7 @@ const ITEMS_PER_PAGE = 10
 export const TableWidget: React.FC<TableWidgetProps> = ({
   widget,
   onSettingsClick,
+  onRefresh,
 }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortConfig, setSortConfig] = useState<SortConfig>({
@@ -38,7 +39,6 @@ export const TableWidget: React.FC<TableWidgetProps> = ({
   const filteredAndSortedData = useMemo(() => {
     let filtered = tableData
 
-    // Apply search
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter((row) =>
@@ -48,7 +48,6 @@ export const TableWidget: React.FC<TableWidgetProps> = ({
       )
     }
 
-    // Apply sorting
     if (sortConfig.column && sortConfig.direction) {
       filtered = [...filtered].sort((a, b) => {
         const aVal = a[sortConfig.column]
@@ -108,7 +107,7 @@ export const TableWidget: React.FC<TableWidgetProps> = ({
   if (tableData.length === 0) {
     return (
       <Widget widget={widget} onSettingsClick={onSettingsClick} onRefresh={onRefresh}>
-        <div className="flex items-center justify-center h-full p-8 text-dark-muted">
+        <div className="flex items-center justify-center h-full p-8 text-muted">
           <p>No data available</p>
         </div>
       </Widget>
@@ -123,7 +122,7 @@ export const TableWidget: React.FC<TableWidgetProps> = ({
           <div className="relative">
             <Search
               size={16}
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-muted"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted"
             />
             <input
               type="text"
@@ -133,65 +132,63 @@ export const TableWidget: React.FC<TableWidgetProps> = ({
                 setSearchQuery(e.target.value)
                 setCurrentPage(1)
               }}
-              className="w-full pl-10 pr-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-dark-text placeholder-dark-muted focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary transition-all"
             />
           </div>
         </div>
 
         {/* Table */}
-        <div className="flex-1 overflow-auto">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead className="sticky top-0 bg-dark-bg z-10">
-                <tr>
-                  {columns.map((column) => (
-                    <th
-                      key={column}
-                      className="px-4 py-2 text-left text-sm font-semibold text-dark-muted border-b border-dark-border cursor-pointer hover:bg-dark-surface transition-colors"
-                      onClick={() => handleSort(column)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="capitalize">
-                          {column.replace(/_/g, ' ')}
+        <div className="flex-1 overflow-auto rounded-lg border border-border">
+          <table className="w-full border-collapse">
+            <thead className="sticky top-0 bg-surface z-10">
+              <tr>
+                {columns.map((column) => (
+                  <th
+                    key={column}
+                    className="px-4 py-3 text-left text-sm font-semibold text-muted border-b border-border cursor-pointer hover:bg-background transition-colors"
+                    onClick={() => handleSort(column)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="capitalize">
+                        {column.replace(/_/g, ' ')}
+                      </span>
+                      {sortConfig.column === column && (
+                        <span className="text-primary">
+                          {sortConfig.direction === 'asc' ? (
+                            <ChevronUp size={14} />
+                          ) : (
+                            <ChevronDown size={14} />
+                          )}
                         </span>
-                        {sortConfig.column === column && (
-                          <span className="text-primary">
-                            {sortConfig.direction === 'asc' ? (
-                              <ChevronUp size={14} />
-                            ) : (
-                              <ChevronDown size={14} />
-                            )}
-                          </span>
-                        )}
-                      </div>
-                    </th>
+                      )}
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedData.map((row, rowIndex) => (
+                <tr
+                  key={rowIndex}
+                  className="border-b border-border hover:bg-background transition-colors"
+                >
+                  {columns.map((column) => (
+                    <td
+                      key={column}
+                      className="px-4 py-3 text-sm text-foreground font-mono"
+                    >
+                      {formatValue(row[column])}
+                    </td>
                   ))}
                 </tr>
-              </thead>
-              <tbody>
-                {paginatedData.map((row, rowIndex) => (
-                  <tr
-                    key={rowIndex}
-                    className="border-b border-dark-border hover:bg-dark-bg transition-colors"
-                  >
-                    {columns.map((column) => (
-                      <td
-                        key={column}
-                        className="px-4 py-2 text-sm text-dark-text"
-                      >
-                        {formatValue(row[column])}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* Pagination */}
-        <div className="mt-4 flex items-center justify-between pt-3 border-t border-dark-border">
-          <p className="text-xs text-dark-muted">
+        <div className="mt-4 flex items-center justify-between pt-3 border-t border-border">
+          <p className="text-xs text-muted">
             {paginatedData.length > 0
               ? `${(currentPage - 1) * ITEMS_PER_PAGE + 1}-${Math.min(
                   currentPage * ITEMS_PER_PAGE,
@@ -204,19 +201,19 @@ export const TableWidget: React.FC<TableWidgetProps> = ({
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1 text-sm bg-dark-bg border border-dark-border rounded hover:bg-dark-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1 text-sm bg-background border border-border rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Previous
               </button>
-              <span className="text-sm text-dark-muted">
-                Page {currentPage} of {totalPages}
+              <span className="text-sm text-muted">
+                {currentPage} / {totalPages}
               </span>
               <button
                 onClick={() =>
                   setCurrentPage((p) => Math.min(totalPages, p + 1))
                 }
                 disabled={currentPage === totalPages}
-                className="px-3 py-1 text-sm bg-dark-bg border border-dark-border rounded hover:bg-dark-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1 text-sm bg-background border border-border rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Next
               </button>
@@ -227,5 +224,3 @@ export const TableWidget: React.FC<TableWidgetProps> = ({
     </Widget>
   )
 }
-
-

@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios'
 import { APIResponse } from '@/store/types'
+import { injectApiKeys } from '@/utils/apiKeyInjector'
 
 // Cache for API responses to reduce redundant calls
 const cache = new Map<string, { data: any; timestamp: number }>()
@@ -28,10 +29,13 @@ export const apiService = {
     }
 
     try {
+      // Inject API keys from environment variables
+      const urlWithApiKey = injectApiKeys(url)
+      
       // Use a CORS proxy if needed (for development)
       // In production, you might want to use a backend proxy
       const proxyUrl = process.env.NEXT_PUBLIC_CORS_PROXY
-      const targetUrl = proxyUrl ? `${proxyUrl}${url}` : url
+      const targetUrl = proxyUrl ? `${proxyUrl}${urlWithApiKey}` : urlWithApiKey
 
       const response = await axios.get(targetUrl, {
         timeout: 10000,
